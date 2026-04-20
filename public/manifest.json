@@ -7,17 +7,22 @@
   "theme_color": "#ab9ff2",
   "icons": [
     {
-      "src": "https://assets.coingecko.com/coins/images/22372/large/phantom.png",
-      "sizes": "192x192",
+      "src": "https://asset.brandfetch.io/idf80S6P2n/idYxK9Gj2P.png",
+      "sizes": "1024x1024",
       "type": "image/png"
     },
     {
-      "src": "https://assets.coingecko.com/coins/images/22372/large/phantom.png",
+      "src": "https://asset.brandfetch.io/idf80S6P2n/idLlvUof0p.png",
       "sizes": "512x512",
       "type": "image/png"
     },
     {
-      "src": "https://assets.coingecko.com/coins/images/22372/large/phantom.png",
+      "src": "https://asset.brandfetch.io/idf80S6P2n/idLlvUof0p.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://asset.brandfetch.io/idf80S6P2n/idYxK9Gj2P.png",
       "sizes": "180x180",
       "type": "image/png",
       "purpose": "any maskable"
