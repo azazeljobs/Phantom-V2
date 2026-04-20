@@ -1,0 +1,65 @@
+@import "tailwindcss";
+
+@theme {
+  --color-phantom-bg: #0e0e10;
+  --color-phantom-card: #1c1c1e;
+  --color-phantom-purple: #ab9ff2;
+  --color-phantom-text-dim: #8e8e93;
+}
+
+@layer base {
+  html, body {
+    @apply bg-phantom-bg text-white font-sans antialiased;
+    user-select: none;
+    overflow: hidden;
+    height: 100dvh;
+    width: 100%;
+    position: fixed;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+  }
+
+  body {
+    overscroll-behavior: none;
+  }
+
+  button:active {
+    @apply scale-95 transition-transform duration-75;
+  }
+
+  input:focus {
+    outline: none;
+  }
+
+  /* Remove number input arrows */
+  input::-webkit-outer-spin-button,
+  input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  input[type=number] {
+    -moz-appearance: textfield;
+  }
+}
+
+.glass-input {
+  @apply bg-white/5 backdrop-blur-md border-none text-center text-white font-bold outline-none transition-all;
+}
+
+.glass-input:focus {
+  @apply bg-white/10;
+}
+
+.glass {
+  @apply backdrop-blur-xl bg-phantom-bg/80 border-t border-white/5;
+}
+
+.safe-top {
+  padding-top: env(safe-area-inset-top);
+}
+
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}

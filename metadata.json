@@ -1,0 +1,5 @@
+{
+  "name": "Phantom",
+  "description": "A high-fidelity mobile clone of the Phantom Wallet iOS app.",
+  "requestFramePermissions": []
+}
