@@ -64,6 +64,7 @@ interface Transaction {
   status: 'confirmed' | 'pending';
   timestamp: number;
   address: string;
+  hash?: string;
 }
 
 interface Toast {
@@ -320,7 +321,8 @@ export default function App() {
       usdValue,
       status: 'confirmed',
       timestamp: Date.now(),
-      address
+      address,
+      hash: Array.from({length: 44}, () => "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"[Math.floor(Math.random() * 58)]).join('')
     };
 
     setTransactions(prev => [newTx, ...prev]);
@@ -1343,6 +1345,7 @@ function SwapInput({ label, amount, symbol, balance, isEstimate }: { label: stri
 }
 
 const ActivityRow: React.FC<{ tx: Transaction; tokenIcon: string; isLast: boolean }> = ({ tx, tokenIcon, isLast }) => {
+  const [isExpanded, setIsExpanded] = useState(false);
   const Icon = tx.type === 'receive' ? ArrowDownLeft : tx.type === 'send' ? ArrowUpRight : ArrowLeftRight;
   const color = tx.type === 'receive' ? 'text-phantom-purple' : tx.type === 'send' ? 'text-red-400' : 'text-phantom-purple';
   const iconBg = tx.type === 'receive' ? 'bg-phantom-purple/10' : tx.type === 'send' ? 'bg-red-400/10' : 'bg-phantom-purple/10';
@@ -1361,31 +1364,114 @@ const ActivityRow: React.FC<{ tx: Transaction; tokenIcon: string; isLast: boolea
   }, [tx.timestamp]);
 
   return (
-    <div className={`flex items-center justify-between p-4 hover:bg-white/5 transition-colors cursor-pointer ${!isLast ? 'border-b border-white/5' : ''}`}>
-      <div className="flex items-center gap-3">
-        <div className="relative">
-          <div className="w-10 h-10 rounded-full bg-black/20 overflow-hidden">
-            <img src={tokenIcon} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+    <div 
+      onClick={() => setIsExpanded(!isExpanded)}
+      className={`flex flex-col p-4 hover:bg-white/5 transition-colors cursor-pointer ${!isLast ? 'border-b border-white/5' : ''}`}
+    >
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="relative">
+            <div className="w-10 h-10 rounded-full bg-black/20 overflow-hidden">
+              <img src={tokenIcon} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+            </div>
+            <div className={`absolute -bottom-1 -right-1 w-5 h-5 rounded-full ${iconBg} flex items-center justify-center border-2 border-phantom-card ${color}`}>
+              <Icon className="w-3 h-3" />
+            </div>
           </div>
-          <div className={`absolute -bottom-1 -right-1 w-5 h-5 rounded-full ${iconBg} flex items-center justify-center border-2 border-phantom-card ${color}`}>
-            <Icon className="w-3 h-3" />
+          <div>
+            <p className="font-bold text-sm capitalize">{tx.type} {tx.tokenSymbol}</p>
+            <p className="text-xs text-phantom-text-dim font-medium">{tx.type === 'send' ? 'To' : 'From'}: {truncateAddress(tx.address)}</p>
           </div>
         </div>
-        <div>
-          <p className="font-bold text-sm capitalize">{tx.type} {tx.tokenSymbol}</p>
-          <p className="text-xs text-phantom-text-dim font-medium">{tx.type === 'send' ? 'To' : 'From'}: {truncateAddress(tx.address)}</p>
+        <div className="text-right">
+          <p className={`font-bold text-sm ${tx.type === 'receive' ? 'text-phantom-purple' : ''}`}>
+            {tx.type === 'receive' ? '+' : tx.type === 'send' ? '-' : ''}{tx.amount.toLocaleString(undefined, { maximumFractionDigits: 4 })} {tx.tokenSymbol}
+          </p>
+          <div className="flex items-center justify-end gap-1">
+            <span className="text-[10px] text-phantom-text-dim font-bold uppercase tracking-tighter">{tx.status}</span>
+            <span className="text-[10px] text-phantom-text-dim opacity-50">•</span>
+            <span className="text-[10px] text-phantom-text-dim font-bold uppercase tracking-tighter">{timeString}</span>
+          </div>
         </div>
       </div>
-      <div className="text-right">
-        <p className={`font-bold text-sm ${tx.type === 'receive' ? 'text-phantom-purple' : ''}`}>
-          {tx.type === 'receive' ? '+' : tx.type === 'send' ? '-' : ''}{tx.amount.toLocaleString(undefined, { maximumFractionDigits: 4 })} {tx.tokenSymbol}
-        </p>
-        <div className="flex items-center justify-end gap-1">
-          <span className="text-[10px] text-phantom-text-dim font-bold uppercase tracking-tighter">{tx.status}</span>
-          <span className="text-[10px] text-phantom-text-dim opacity-50">•</span>
-          <span className="text-[10px] text-phantom-text-dim font-bold uppercase tracking-tighter">{timeString}</span>
-        </div>
-      </div>
+
+      <AnimatePresence>
+        {isExpanded && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            className="overflow-hidden"
+          >
+            <div className="pt-4 mt-4 border-t border-white/5 space-y-4">
+              <div className="space-y-1">
+                <p className="text-[10px] font-bold text-phantom-text-dim uppercase tracking-wider">
+                  {tx.type === 'send' ? 'Recipient' : 'Sender'} Address
+                </p>
+                <div className="flex items-center justify-between gap-2 bg-white/5 p-3 rounded-xl border border-white/5 group">
+                  <span className="text-xs font-mono text-white/70 break-all leading-relaxed">
+                    {tx.address}
+                  </span>
+                  <button 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigator.clipboard.writeText(tx.address);
+                    }}
+                    className="p-2 hover:bg-white/10 rounded-lg transition-colors shrink-0"
+                  >
+                    <Copy className="w-3 h-3 text-phantom-text-dim" />
+                  </button>
+                </div>
+              </div>
+
+              {tx.hash && (
+                <div className="space-y-1">
+                  <p className="text-[10px] font-bold text-phantom-text-dim uppercase tracking-wider">
+                    Transaction Signature
+                  </p>
+                  <div className="flex items-center justify-between gap-2 bg-white/5 p-3 rounded-xl border border-white/5 group">
+                    <span className="text-xs font-mono text-white/70 break-all leading-relaxed">
+                      {tx.hash}
+                    </span>
+                    <button 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        navigator.clipboard.writeText(tx.hash!);
+                      }}
+                      className="p-2 hover:bg-white/10 rounded-lg transition-colors shrink-0"
+                    >
+                      <Copy className="w-3 h-3 text-phantom-text-dim" />
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              <div className="flex gap-3 pt-2">
+                <a 
+                  href={`https://solscan.io/tx/${tx.hash}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={(e) => e.stopPropagation()}
+                  className="flex-1 flex items-center justify-center gap-2 py-3 bg-white/5 text-xs font-bold rounded-xl border border-white/5 hover:bg-white/10 transition-colors"
+                >
+                  <ExternalLink className="w-3 h-3" />
+                  View on Solscan
+                </a>
+                <a 
+                  href={`https://explorer.solana.com/tx/${tx.hash}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={(e) => e.stopPropagation()}
+                  className="flex-1 flex items-center justify-center gap-2 py-3 bg-white/5 text-xs font-bold rounded-xl border border-white/5 hover:bg-white/10 transition-colors"
+                >
+                  <Globe className="w-3 h-3" />
+                  Solana Explorer
+                </a>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

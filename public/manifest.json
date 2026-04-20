@@ -7,17 +7,17 @@
   "theme_color": "#ab9ff2",
   "icons": [
     {
-      "src": "https://avatars.githubusercontent.com/u/79051515?s=192&v=4",
+      "src": "https://assets.coingecko.com/coins/images/22372/large/phantom.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "https://avatars.githubusercontent.com/u/79051515?s=512&v=4",
+      "src": "https://assets.coingecko.com/coins/images/22372/large/phantom.png",
       "sizes": "512x512",
       "type": "image/png"
     },
     {
-      "src": "https://avatars.githubusercontent.com/u/79051515?s=180&v=4",
+      "src": "https://assets.coingecko.com/coins/images/22372/large/phantom.png",
       "sizes": "180x180",
       "type": "image/png",
       "purpose": "any maskable"
